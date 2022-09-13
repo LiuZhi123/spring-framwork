@@ -78,8 +78,10 @@ public abstract class BeanFactoryUtils {
 	 * @return the transformed name
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 */
+	//解析beanName  实际上的逻辑是去除factoryBean的前缀
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
+		//如果不是工厂类型的beanName  直接返回
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}

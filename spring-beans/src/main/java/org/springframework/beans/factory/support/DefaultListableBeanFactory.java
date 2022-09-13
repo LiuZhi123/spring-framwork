@@ -918,6 +918,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		//从当前的beanDefinition中获取bean名称集合
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
@@ -925,8 +926,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			//获取每个bean的父级bean，转换为RootBeanDefinition对象
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				//判断是否工厂bean，如果是的话从容器中获取factoryBean
 				if (isFactoryBean(beanName)) {
-					//获得该bean的工厂bean，工厂bean的命名规则为&+对应的beanName
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean<?> factory) {
 						boolean isEagerInit = (factory instanceof SmartFactoryBean &&
@@ -942,6 +943,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 		}
+		//todo post-initializatio 的回调？与webSocket有关
 
 		// Trigger post-initialization callback for all applicable beans...
 		for (String beanName : beanNames) {
@@ -978,7 +980,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		//从beanDefinitionMap中通过beanName获取，判断是否存在
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
-		//如果是已经存在的bean，则更新混村中
+		//如果是已经存在的bean，则更新缓存
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);

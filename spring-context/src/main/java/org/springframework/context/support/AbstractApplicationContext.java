@@ -551,22 +551,31 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		synchronized (this.startupShutdownMonitor) {
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
+			//准备刷新容器环境
 			// Prepare this context for refreshing.
 			prepareRefresh();
 
+			//准备beanFactory容器
 			// Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
+			//准备beanFactory并注册一些基础bean，此处为最顶层的ConfigurableListableBeanFactory
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				//执行预定义bean的beanFactory注册后置处理器
 				postProcessBeanFactory(beanFactory);
-
+				//快开始执行bean处理逻辑
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+
+
+				//执行beanFactoryPostProcessors的逻辑
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
+
+				//todo 执行beanPostProcessors逻辑
 
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
@@ -634,13 +643,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				logger.debug("Refreshing " + getDisplayName());
 			}
 		}
-
+		//初始化属性资源
 		// Initialize any placeholder property sources in the context environment.
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
 		getEnvironment().validateRequiredProperties();
+
+		//todo 注册监听器
 
 		// Store pre-refresh ApplicationListeners...
 		if (this.earlyApplicationListeners == null) {
