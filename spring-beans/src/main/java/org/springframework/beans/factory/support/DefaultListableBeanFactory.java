@@ -906,10 +906,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return (this.configurationFrozen || super.isBeanEligibleForMetadataCaching(beanName));
 	}
 
-	/**
-	 * 各上下文接口的具体实现生成bean的逻辑
-	 * @throws BeansException
-	 */
+	//todo  getBean 获取单例bean的实现
 	@Override
 	public void preInstantiateSingletons() throws BeansException {
 		if (logger.isTraceEnabled()) {
@@ -938,7 +935,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
-					//真正获取bean实例的方法
+					//todo 真正获取bean实例的方法
 					getBean(beanName);
 				}
 			}
@@ -961,7 +958,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	//---------------------------------------------------------------------
 	// Implementation of BeanDefinitionRegistry interface
 	//---------------------------------------------------------------------
-
+	//注册beanDefinition的实现
 	@Override
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
@@ -978,7 +975,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						"Validation of bean definition failed", ex);
 			}
 		}
-		//从beanDefinitionMap中通过beanName获取，判断是否存在
+		//从缓存中通过beanName获取，判断是否存在
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
 		//如果是已经存在的bean，则更新缓存
 		if (existingDefinition != null) {

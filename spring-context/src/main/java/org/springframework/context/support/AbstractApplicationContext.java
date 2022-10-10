@@ -551,26 +551,24 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		synchronized (this.startupShutdownMonitor) {
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
-			//准备刷新容器环境
+			//准备刷新容器环境，配置容器状态，初始化配置资源？，注册早期监听器及事件
 			// Prepare this context for refreshing.
 			prepareRefresh();
 
-			//准备beanFactory容器
+			//销毁容器及容器内的bean 创建新的ioc容器 ，配置容器的重写bean的属性，返回创建的beanFactory对象
 			// Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			//准备beanFactory并注册一些基础bean，此处为最顶层的ConfigurableListableBeanFactory
+			//准备beanFactory，1.添加实现了某些接口的bean的后置处理器，主要是添加当前容器对象和部分监听对象 2.单独先生成某些environment的单例bean
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				//执行预定义bean的beanFactory注册后置处理器
+				//添加beanFactory的postProcessBeanFactory处理器
 				postProcessBeanFactory(beanFactory);
 				//快开始执行bean处理逻辑
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
-
-
 				//这里会去加载实现了BeanDefinitionRegistryPostProcessor接口手动注册beanDefinition的逻辑 beanFactoryPostProcessors的逻辑
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
@@ -651,8 +649,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// see ConfigurablePropertyResolver#setRequiredProperties
 		getEnvironment().validateRequiredProperties();
 
-		//todo 注册监听器
-
+		//注册早期监听器
 		// Store pre-refresh ApplicationListeners...
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
