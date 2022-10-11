@@ -235,16 +235,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @return an instance of the bean
 	 * @throws BeansException if the bean could not be created
 	 */
-	/**
-	 * 获取bean的执行逻辑
-	 * @param name
-	 * @param requiredType
-	 * @param args
-	 * @param typeCheckOnly
-	 * @param <T>
-	 * @return
-	 * @throws BeansException
-	 */
+	//获取bean的对象并添加到IOC容器中的执行逻辑
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
@@ -252,7 +243,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		String beanName = transformedBeanName(name);
 		Object beanInstance;
-		//尝试获取单例bean实例
+		//尝试获取单例bean实例.内部从一级缓存二级缓存三级缓存中获取bean对象，如果获取不到则通过反射创建，内部有循环依赖问题
 		// Eagerly check singleton cache for manually registered singletons.
 		Object sharedInstance = getSingleton(beanName);
 		//如果获取bean成功
@@ -267,23 +258,24 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
-			//todo 应该是转换bean的逻辑
+			//应该是转换bean的逻辑
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 		//如果获取bean失败
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
-			//判断是否是原型bean
+			//判断bean是否在创建过程中，抛出循环依赖无法解决的异常
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
-			//获取父级beanFactory
+			//获取父级容器对象并判断beanName对应的beanDefinition是否在容器中存在
 			// Check if bean definition exists in this factory.
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
 				String nameToLookup = originalBeanName(name);
+				//如果父级容器是顶级容器，那么委托顶级容器去获取bean
 				if (parentBeanFactory instanceof AbstractBeanFactory) {
 					return ((AbstractBeanFactory) parentBeanFactory).doGetBean(
 							nameToLookup, requiredType, args, typeCheckOnly);
@@ -300,8 +292,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					return (T) parentBeanFactory.getBean(nameToLookup);
 				}
 			}
-
+			//是否进行类型检查？
 			if (!typeCheckOnly) {
+				//
 				markBeanAsCreated(beanName);
 			}
 

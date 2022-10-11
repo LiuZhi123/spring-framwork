@@ -565,16 +565,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				//添加beanFactory的postProcessBeanFactory处理器
+				//beanFactory中添加自定义的ServletContextAwareProcessor类型的postProcessBeanFactory处理器
 				postProcessBeanFactory(beanFactory);
 				//快开始执行bean处理逻辑
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
-				//这里会去加载实现了BeanDefinitionRegistryPostProcessor接口手动注册beanDefinition的逻辑 beanFactoryPostProcessors的逻辑
+				//容器中添加beanFactoryPostProcessors处理器
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				//todo 执行beanPostProcessors逻辑
-
+				//注册beanPostProcessors处理器并对其进行排序
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
@@ -585,12 +584,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
+				//用于前后端未分离的项目，配置前端模板引擎thymeleaf等并生成对应的themeSource bean，不用特别关注，springboot中会重写该方法并启动web项目的tomcat
 				// Initialize other special beans in specific context subclasses.
 				onRefresh();
 
 				// Check for listener beans and register them.
 				registerListeners();
 
+				//初始化所有剩余的非懒加载的单例bean(用户自定义bean)
 				// Instantiate all remaining (non-lazy-init) singletons.
 				finishBeanFactoryInitialization(beanFactory);
 

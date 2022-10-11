@@ -906,7 +906,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return (this.configurationFrozen || super.isBeanEligibleForMetadataCaching(beanName));
 	}
 
-	//todo  getBean 获取单例bean的实现
+	//通过beanDefinition集合获取beanName的集合
 	@Override
 	public void preInstantiateSingletons() throws BeansException {
 		if (logger.isTraceEnabled()) {
@@ -935,7 +935,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
-					//todo 真正获取bean实例的方法
 					getBean(beanName);
 				}
 			}
