@@ -592,7 +592,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				//初始化所有剩余的非懒加载的单例bean(用户自定义bean)
-				// Instantiate all remaining (non-lazy-init) singletons.
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -927,7 +926,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Allow for caching all bean definition metadata, not expecting further changes.
 		beanFactory.freezeConfiguration();
 
-		// Instantiate all remaining (non-lazy-init) singletons.
+		// 实例化单例bean
 		beanFactory.preInstantiateSingletons();
 	}
 
@@ -945,9 +944,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
+		//刷新容器？
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
+		//发布事件通知？
 		publishEvent(new ContextRefreshedEvent(this));
 	}
 
